@@ -1,8 +1,8 @@
-import { ArrowUpRight, Check, Terminal } from 'lucide-react'
-
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { buttonVariants } from '@/components/ui/button'
+import { Icon } from '@/components/ui/icon'
+import { appIcons } from '@/config/icons'
 import { cn } from '@/lib/utils'
 import { getTranslate } from '@/tolgee/server'
 
@@ -14,6 +14,9 @@ export default async function HomePage() {
     t('common:home.foundation.tailwind', 'Tailwind CSS v4'),
     t('common:home.foundation.shadcn', 'shadcn/ui ที่เป็น source ของโปรเจกต์'),
     t('common:home.foundation.api', 'Type ที่ generate จาก OpenAPI'),
+    t('common:home.foundation.query', 'TanStack Query สำหรับ server state'),
+    t('common:home.foundation.redux', 'Redux Toolkit สำหรับ global client state'),
+    t('common:home.foundation.icons', 'ไอคอนจาก Iconify'),
     t('common:home.foundation.i18n', 'ภาษาไทย/อังกฤษด้วย Tolgee'),
     t('common:home.foundation.theme', 'ธีมตามค่าของระบบ')
   ]
@@ -49,7 +52,7 @@ export default async function HomePage() {
               thaiLabel={t('common:language.th', 'ไทย')}
               englishLabel={t('common:language.en', 'อังกฤษ')}
             />
-            <ThemeToggle />
+            <ThemeToggle label={t('common:theme.toggle', 'สลับธีมสี')} />
           </div>
         </header>
 
@@ -78,7 +81,7 @@ export default async function HomePage() {
                 target='_blank'
                 rel='noreferrer'>
                 {t('common:home.action.components', 'ดู components')}
-                <ArrowUpRight data-icon='inline-end' aria-hidden='true' />
+                <Icon icon={appIcons.arrowOutward} data-icon='inline-end' aria-hidden='true' />
               </a>
               <a
                 className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), 'min-h-11 px-5')}
@@ -102,14 +105,14 @@ export default async function HomePage() {
                 <li key={item} className='flex items-center gap-3 border-t border-border py-3 first:border-t-0'>
                   <span className='font-mono text-xs text-muted-foreground'>{String(index + 1).padStart(2, '0')}</span>
                   <span className='flex-1 text-sm'>{item}</span>
-                  <Check className='size-4 shrink-0 text-emerald-600' aria-hidden='true' />
+                  <Icon icon={appIcons.check} className='size-4 shrink-0 text-emerald-600' aria-hidden='true' />
                 </li>
               ))}
             </ul>
 
             <div className='mt-7 rounded-lg bg-foreground p-4 text-background'>
               <div className='flex items-center gap-2 font-mono text-[0.6875rem] tracking-wider uppercase opacity-60'>
-                <Terminal className='size-3.5' aria-hidden='true' />
+                <Icon icon={appIcons.terminal} className='size-3.5' aria-hidden='true' />
                 {t('common:home.firstMove', 'คำสั่งแรก')}
               </div>
               <code className='mt-3 block overflow-x-auto font-mono text-xs leading-6 whitespace-nowrap'>

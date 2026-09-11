@@ -1,7 +1,7 @@
-import { ArrowLeft } from 'lucide-react'
-
 import { StatusPage } from '@/components/status-page'
 import { buttonVariants } from '@/components/ui/button'
+import { Icon } from '@/components/ui/icon'
+import { appIcons } from '@/config/icons'
 import { Link } from '@/i18n/navigation'
 import { getTranslate } from '@/tolgee/server'
 
@@ -15,7 +15,7 @@ export default async function NotFoundPage() {
       description={t('common:error.notFound.description', 'ที่อยู่อาจไม่ถูกต้อง หรือหน้านี้อาจถูกย้ายแล้ว')}
       action={
         <Link className={buttonVariants({ size: 'lg' })} href='/'>
-          <ArrowLeft data-icon='inline-start' aria-hidden='true' />
+          <Icon icon={appIcons.arrowBack} data-icon='inline-start' aria-hidden='true' />
           {t('common:error.notFound.home', 'กลับหน้าหลัก')}
         </Link>
       }

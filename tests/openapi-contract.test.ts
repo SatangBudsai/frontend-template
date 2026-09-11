@@ -76,3 +76,10 @@ test('package exposes one Axios API generation command', async () => {
   assert.equal(manifest.dependencies?.['axios'], '1.18.1')
   assert.equal(manifest.devDependencies?.['swagger-typescript-api'], '13.12.6')
 })
+
+test('service wrapper fails clearly when its runtime base URL is missing', async () => {
+  const source = await readFile(resolve('src/api/example-service/index.ts'), 'utf8')
+
+  assert.match(source, /NEXT_PUBLIC_SERVICE\?\.trim\(\)/)
+  assert.match(source, /NEXT_PUBLIC_SERVICE is required before using exampleService/)
+})

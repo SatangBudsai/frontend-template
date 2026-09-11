@@ -60,6 +60,7 @@
 - เมื่อ component ยังไม่มี -> CLI สร้าง source ใน `src/components/ui`
 - เมื่อ component มีอยู่แล้ว -> ตรวจ diff ก่อนอนุญาต overwrite เพื่อไม่ให้ customization หาย
 - import ด้วย `@/components/ui/<component>` -> อย่าสร้าง component path คู่ขนานโดยไม่มีเหตุผล
+- shadcn CLI ยังไม่มี Iconify target -> component ที่ generate แล้วมี icon ต้องเปลี่ยนมาใช้ `@/components/ui/icon` และลบ icon dependency ที่ไม่ใช้
 
 ### STEP 4 — Validate the change
 
@@ -83,6 +84,12 @@
 ## 5. API specification
 
 Baseline ไม่มี application API Route แต่มี Swagger contract ตัวอย่างที่ `src/api/example-service/example-service.swagger.json`; ใช้ `pnpm generate` สร้าง Axios client/DTO และเข้าถึงผ่าน `src/api/example-service/index.ts`
+
+TanStack Query อยู่ที่ `src/providers/query-provider.tsx` สำหรับข้อมูลจาก server ที่ Client Component ต้อง cache, refetch, poll หรือ optimistic update ส่วน Redux Toolkit อยู่ที่ `src/store/**` และ `src/providers/redux-provider.tsx` สำหรับ global mutable client state ห้ามเก็บ remote data ชุดเดียวกันซ้ำในทั้ง Query และ Redux
+
+Icon ทั้งโปรเจกต์เรียกผ่าน `src/components/ui/icon.tsx` โดยเก็บ Iconify IDs ที่ใช้ซ้ำไว้ใน `src/config/icons.ts`; ไม่มี `lucide-react` ใน baseline
+
+การกำหนดภาษาอยู่ที่ `src/i18n/routing.ts` และ `src/proxy.ts` เพียงจุดกลางเดียว path ที่ไม่มี locale เช่น `/main` จะ redirect เป็น `/th/main` ครั้งแรก หลังผู้ใช้เลือกภาษา proxy จะจำด้วย `NEXT_LOCALE` cookie เป็นเวลา 1 ปีและใช้ภาษานั้นกับ unprefixed path ครั้งถัดไป ไม่ใช้ `localStorage` เพราะ server proxy อ่านไม่ได้
 
 ## 6. Status lifecycle
 
@@ -119,4 +126,4 @@ Baseline ไม่มี application API Route แต่มี Swagger contract 
 
 ## 11. Open questions
 
-ไม่มีคำถามสำหรับ baseline การเลือก authentication, database, state management และ deployment เป็นการตัดสินใจของแต่ละโปรเจกต์เมื่อมี requirement จริง
+ไม่มีคำถามสำหรับ baseline การเลือก authentication, database, Redux slices เฉพาะ feature และ deployment เป็นการตัดสินใจของแต่ละโปรเจกต์เมื่อมี requirement จริง

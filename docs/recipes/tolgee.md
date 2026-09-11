@@ -1,6 +1,6 @@
 # Tolgee localization
 
-The template includes locale-prefixed `/th` and `/en` routes, tracked ICU translations, next-intl navigation, Tolgee server/client providers, a language switcher, and the same pull-to-repository lifecycle used by the eCustom reference project. Thai is the default and source-fallback language.
+The template includes locale-prefixed `/th` and `/en` routes, tracked ICU translations, next-intl navigation, Tolgee server/client providers, a language switcher, and the same pull-to-repository lifecycle used by the eCustom reference project. Thai is the default and source-fallback language. The global proxy prefixes every unlocalized pathname and remembers the last explicit locale in the `NEXT_LOCALE` cookie.
 
 ## Structure
 

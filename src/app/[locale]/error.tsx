@@ -1,9 +1,9 @@
 'use client'
 
-import { RotateCcw } from 'lucide-react'
-
 import { StatusPage } from '@/components/status-page'
 import { Button } from '@/components/ui/button'
+import { Icon } from '@/components/ui/icon'
+import { appIcons } from '@/config/icons'
 import { useLang } from '@/hooks/use-lang'
 
 type ErrorPageProps = {
@@ -24,7 +24,7 @@ export default function ErrorPage({ reset }: ErrorPageProps) {
       )}
       action={
         <Button size='lg' onClick={reset}>
-          <RotateCcw data-icon='inline-start' aria-hidden='true' />
+          <Icon icon={appIcons.refresh} data-icon='inline-start' aria-hidden='true' />
           {t('common:error.application.retry', 'ลองอีกครั้ง')}
         </Button>
       }

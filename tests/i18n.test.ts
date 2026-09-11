@@ -9,6 +9,7 @@ import {
   syncTranslationRepository,
   updateTranslationDefaults
 } from '../scripts/tolgee/repository.mts'
+import { resolvePreferredLocale } from '../src/i18n/routing.ts'
 
 async function readProjectFile(path: string) {
   return readFile(resolve(path), 'utf8')
@@ -37,7 +38,7 @@ test('every namespace has matching Thai and English translation keys', async () 
   }
 })
 
-test('locale routing defaults to Thai and always uses a locale prefix', async () => {
+test('locale routing defaults to Thai, remembers the choice, and always uses a prefix', async () => {
   const [routingSource, proxySource] = await Promise.all([
     readProjectFile('src/i18n/routing.ts'),
     readProjectFile('src/proxy.ts')
@@ -45,8 +46,21 @@ test('locale routing defaults to Thai and always uses a locale prefix', async ()
 
   assert.match(routingSource, /locales = \['th', 'en'\]/)
   assert.match(routingSource, /defaultLocale[^\n]+ = 'th'/)
+  assert.match(routingSource, /localeDetection: false/)
+  assert.match(routingSource, /name: 'NEXT_LOCALE'/)
+  assert.match(routingSource, /maxAge: 60 \* 60 \* 24 \* 365/)
   assert.match(routingSource, /localePrefix: 'always'/)
-  assert.match(proxySource, /createMiddleware\(routing\)/)
+  assert.match(proxySource, /request\.cookies\.get\(localeCookie\.name\)/)
+  assert.match(proxySource, /resolvePreferredLocale\(request\.nextUrl\.pathname, savedLocale\)/)
+  assert.match(proxySource, /createMiddleware\(\{ \.\.\.routing, defaultLocale: preferredLocale \}\)/)
+  assert.match(proxySource, /response\.cookies\.set\(localeCookie\.name/)
+})
+
+test('locale preference uses an explicit prefix, then a saved locale, then Thai', () => {
+  assert.equal(resolvePreferredLocale('/en/projects/42', 'th'), 'en')
+  assert.equal(resolvePreferredLocale('/projects/42', 'en'), 'en')
+  assert.equal(resolvePreferredLocale('/main'), 'th')
+  assert.equal(resolvePreferredLocale('/main', 'unsupported'), 'th')
 })
 
 test('Tolgee stays behind an explicit provider with generated static imports', async () => {

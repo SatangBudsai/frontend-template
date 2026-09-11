@@ -39,7 +39,6 @@
     "iconify",
     "lightbox",
     "lightboxjs",
-    "lucide",
     "nextui",
     "reduxjs",
     "Qorstack",
@@ -49,14 +48,10 @@
     "turbopack",
     "usehooks"
   ],
-  "i18n-ally.localesPaths": ["src/configs/translations/**"],
-  "i18n-ally.keystyle": "nested",
-  "i18n-ally.annotations": false,
   "kiroAgent.configureMCP": "Disabled",
   "search.exclude": {
     "**/node_modules": true,
     "**/.next": true,
-    "**/dist": true,
-    "src/api/generated": true
+    "**/dist": true
   }
 }

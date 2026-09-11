@@ -5,6 +5,8 @@ import { notFound } from 'next/navigation'
 
 import { ThemeProvider } from '@/components/theme-provider'
 import { routing } from '@/i18n/routing'
+import { QueryProvider } from '@/providers/query-provider'
+import { ReduxProvider } from '@/providers/redux-provider'
 import { TolgeeNextProvider } from '@/tolgee/client'
 import { getTolgee, getTranslate } from '@/tolgee/server'
 
@@ -57,7 +59,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
         <NextIntlClientProvider locale={locale} messages={{}}>
           <TolgeeNextProvider language={locale} staticData={staticData}>
             <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-              {children}
+              <ReduxProvider>
+                <QueryProvider>{children}</QueryProvider>
+              </ReduxProvider>
             </ThemeProvider>
           </TolgeeNextProvider>
         </NextIntlClientProvider>

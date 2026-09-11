@@ -1,9 +1,19 @@
 import assert from 'node:assert/strict'
-import { readFile } from 'node:fs/promises'
+import { readFile, readdir } from 'node:fs/promises'
 import test from 'node:test'
 
 async function readProjectFile(path: string) {
   return readFile(new URL(`../${path}`, import.meta.url), 'utf8')
+}
+
+async function readSourceTree() {
+  const sourceRoot = new URL('../src/', import.meta.url)
+  const paths = await readdir(sourceRoot, { recursive: true })
+  const sourceFiles = paths.filter(path => /\.(?:ts|tsx)$/.test(path))
+
+  return Promise.all(sourceFiles.map(path => readFile(new URL(path.replaceAll('\\', '/'), sourceRoot), 'utf8'))).then(
+    files => files.join('\n')
+  )
 }
 
 test('shadcn configuration points to the source-owned UI directory', async () => {
@@ -35,6 +45,49 @@ test('theme support is wired through the root layout', async () => {
   assert.match(layoutSource, /<ThemeProvider[^>]+defaultTheme='system'[^>]+enableSystem/)
 })
 
+test('TanStack Query and Redux use request-safe provider boundaries', async () => {
+  const [manifestSource, layoutSource, queryProviderSource, reduxProviderSource, storeSource, hooksSource] =
+    await Promise.all([
+      readProjectFile('package.json'),
+      readProjectFile('src/app/[locale]/layout.tsx'),
+      readProjectFile('src/providers/query-provider.tsx'),
+      readProjectFile('src/providers/redux-provider.tsx'),
+      readProjectFile('src/store/store.ts'),
+      readProjectFile('src/store/hooks.ts')
+    ])
+  const manifest = JSON.parse(manifestSource) as { dependencies?: Record<string, string> }
+
+  assert.equal(manifest.dependencies?.['@tanstack/react-query'], '5.102.8')
+  assert.equal(manifest.dependencies?.['@reduxjs/toolkit'], '2.12.0')
+  assert.equal(manifest.dependencies?.['react-redux'], '9.3.0')
+  assert.match(queryProviderSource, /environmentManager\.isServer\(\)/)
+  assert.match(queryProviderSource, /staleTime: 60_000/)
+  assert.match(reduxProviderSource, /useState\(makeStore\)/)
+  assert.match(storeSource, /export function makeStore\(\)/)
+  assert.doesNotMatch(storeSource, /export const store\s*=/)
+  assert.match(hooksSource, /useDispatch\.withTypes<AppDispatch>\(\)/)
+  assert.match(layoutSource, /<ReduxProvider>\s*<QueryProvider>\{children\}<\/QueryProvider>\s*<\/ReduxProvider>/)
+})
+
+test('Iconify is the shared icon runtime and Lucide is absent', async () => {
+  const [manifestSource, iconSource, iconConfigSource, componentsSource, applicationSource] = await Promise.all([
+    readProjectFile('package.json'),
+    readProjectFile('src/components/ui/icon.tsx'),
+    readProjectFile('src/config/icons.ts'),
+    readProjectFile('components.json'),
+    readSourceTree()
+  ])
+  const manifest = JSON.parse(manifestSource) as { dependencies?: Record<string, string> }
+  const components = JSON.parse(componentsSource) as { iconLibrary?: string }
+
+  assert.equal(manifest.dependencies?.['@iconify/react'], '6.0.2')
+  assert.equal(manifest.dependencies?.['lucide-react'], undefined)
+  assert.equal(components.iconLibrary, undefined)
+  assert.match(iconSource, /from '@iconify\/react'/)
+  assert.match(iconConfigSource, /material-symbols:/)
+  assert.doesNotMatch(applicationSource, /lucide-react/)
+})
+
 test('App Router fallback boundaries are present', async () => {
   const [loadingSource, errorSource, globalErrorSource, notFoundSource, catchAllSource] = await Promise.all([
     readProjectFile('src/app/[locale]/loading.tsx'),
@@ -48,7 +101,8 @@ test('App Router fallback boundaries are present', async () => {
   assert.match(errorSource, /'use client'/)
   assert.match(errorSource, /reset/)
   assert.match(globalErrorSource, /<html lang='en'>/)
-  assert.match(globalErrorSource, /<body>/)
+  assert.match(globalErrorSource, /global-error\.module\.css/)
+  assert.match(globalErrorSource, /role='alert'/)
   assert.match(notFoundSource, /href='\/'/)
   assert.match(catchAllSource, /notFound\(\)/)
 })
@@ -61,6 +115,8 @@ test('CI runs the complete documented quality gate', async () => {
   for (const command of ['format:check', 'lint', 'typecheck', 'test', 'build']) {
     assert.match(workflowSource, new RegExp(`run: pnpm ${command.replace(':', '\\:')}`))
   }
+
+  assert.doesNotMatch(workflowSource, /playwright|test:e2e/i)
 })
 
 test('integration recipes document the implemented boundaries', async () => {

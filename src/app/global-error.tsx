@@ -1,9 +1,6 @@
 'use client'
 
-import { RotateCcw } from 'lucide-react'
-
-import { StatusPage } from '@/components/status-page'
-import { Button } from '@/components/ui/button'
+import styles from './global-error.module.css'
 
 type GlobalErrorPageProps = {
   error: Error & { digest?: string }
@@ -13,18 +10,23 @@ type GlobalErrorPageProps = {
 export default function GlobalErrorPage({ reset }: GlobalErrorPageProps) {
   return (
     <html lang='en'>
-      <body>
-        <StatusPage
-          eyebrow='Critical error'
-          title='The application needs a fresh start.'
-          description='A root-level error interrupted the page. Retry once, then check the server logs if the problem continues.'
-          action={
-            <Button size='lg' onClick={reset}>
-              <RotateCcw data-icon='inline-start' aria-hidden='true' />
-              Reload application
-            </Button>
-          }
-        />
+      <body className={styles.body}>
+        <title>Application error</title>
+        <main className={styles.main}>
+          <section className={styles.panel} role='alert'>
+            <p className={styles.eyebrow}>
+              Application error / <span lang='th'>แอปพลิเคชันขัดข้อง</span>
+            </p>
+            <h1 className={styles.title}>The application needs a fresh start.</h1>
+            <p className={styles.description}>
+              A root-level error interrupted the page.{' '}
+              <span lang='th'>เกิดข้อผิดพลาดระดับระบบ กรุณาลองโหลดแอปพลิเคชันอีกครั้ง</span>
+            </p>
+            <button className={styles.button} type='button' onClick={reset}>
+              Reload application / <span lang='th'>โหลดใหม่</span>
+            </button>
+          </section>
+        </main>
       </body>
     </html>
   )
