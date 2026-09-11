@@ -1,9 +1,0 @@
-import React from 'react'
-
-type Props = {}
-
-const Demo = (props: Props) => {
-  return <div>index</div>
-}
-
-export default Demo

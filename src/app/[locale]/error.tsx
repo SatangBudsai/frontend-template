@@ -1,0 +1,33 @@
+'use client'
+
+import { RotateCcw } from 'lucide-react'
+
+import { StatusPage } from '@/components/status-page'
+import { Button } from '@/components/ui/button'
+import { useLang } from '@/hooks/use-lang'
+
+type ErrorPageProps = {
+  error: Error & { digest?: string }
+  reset: () => void
+}
+
+export default function ErrorPage({ reset }: ErrorPageProps) {
+  const { t } = useLang()
+
+  return (
+    <StatusPage
+      eyebrow={t('common:error.application.eyebrow', 'แอปพลิเคชันขัดข้อง')}
+      title={t('common:error.application.title', 'เกิดข้อผิดพลาดบางอย่าง')}
+      description={t(
+        'common:error.application.description',
+        'หน้าเว็บโหลดไม่สำเร็จ ลองใหม่อีกครั้ง โดยรายละเอียดภายในจะอยู่ใน server logs'
+      )}
+      action={
+        <Button size='lg' onClick={reset}>
+          <RotateCcw data-icon='inline-start' aria-hidden='true' />
+          {t('common:error.application.retry', 'ลองอีกครั้ง')}
+        </Button>
+      }
+    />
+  )
+}

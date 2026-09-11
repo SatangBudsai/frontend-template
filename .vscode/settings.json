@@ -1,5 +1,28 @@
 {
   "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/.next/**": true,
+    "**/dist/**": true
+  },
   "headwind.runOnSave": true,
   "cSpell.ignoreRegExpList": ["/[\\u0E00-\\u0E7F]/g"],
   "css.lint.unknownAtRules": "ignore",
@@ -10,20 +33,30 @@
   "cSpell.words": [
     "akar",
     "clsx",
+    "QorstackReport",
+    "heroui",
     "hugeicons",
     "iconify",
     "lightbox",
     "lightboxjs",
     "lucide",
     "nextui",
-    "nprogress",
     "reduxjs",
+    "Qorstack",
     "swiper",
     "tailwindcss",
     "tanstack",
+    "turbopack",
     "usehooks"
   ],
   "i18n-ally.localesPaths": ["src/configs/translations/**"],
   "i18n-ally.keystyle": "nested",
-  "i18n-ally.annotations": false
+  "i18n-ally.annotations": false,
+  "kiroAgent.configureMCP": "Disabled",
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/dist": true,
+    "src/api/generated": true
+  }
 }
