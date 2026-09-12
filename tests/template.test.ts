@@ -31,15 +31,21 @@ test('package manifest does not depend on HeroUI', async () => {
 })
 
 test('theme support is wired through the root layout', async () => {
-  const [manifestSource, layoutSource] = await Promise.all([
+  const [manifestSource, layoutSource, themePatchSource] = await Promise.all([
     readProjectFile('package.json'),
-    readProjectFile('src/app/[locale]/layout.tsx')
+    readProjectFile('src/app/[locale]/layout.tsx'),
+    readProjectFile('patches/next-themes@0.4.6.patch')
   ])
-  const manifest = JSON.parse(manifestSource) as { dependencies?: Record<string, string> }
+  const manifest = JSON.parse(manifestSource) as {
+    dependencies?: Record<string, string>
+    pnpm?: { patchedDependencies?: Record<string, string> }
+  }
 
   expect(manifest.dependencies?.['next-themes']).toBe('0.4.6')
+  expect(manifest.pnpm?.patchedDependencies?.['next-themes@0.4.6']).toBe('patches/next-themes@0.4.6.patch')
   expect(layoutSource).toMatch(/suppressHydrationWarning/)
   expect(layoutSource).toMatch(/<ThemeProvider[^>]+defaultTheme='system'[^>]+enableSystem/)
+  expect(themePatchSource.match(/if\(typeof window!=="undefined"\)return null/g)).toHaveLength(2)
 })
 
 test('TanStack Query and Redux use request-safe provider boundaries', async () => {

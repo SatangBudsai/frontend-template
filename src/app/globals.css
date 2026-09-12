@@ -24,22 +24,6 @@
 }
 
 @layer utilities {
-  html[lang='th'] body {
-    line-height: 1.4;
-  }
-
-  html[lang='th'] :where(p, li, dt, dd, a, button, label, input, textarea, select) {
-    line-height: 1.35;
-  }
-
-  html[lang='th'] h1 {
-    line-height: 0.92;
-  }
-
-  html[lang='th'] :where(h2, h3, h4, h5, h6) {
-    line-height: 1.1;
-  }
-
   .template-grid {
     background-image:
       linear-gradient(to right, color-mix(in oklch, var(--border) 55%, transparent) 1px, transparent 1px),

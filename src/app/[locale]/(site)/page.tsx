@@ -80,9 +80,7 @@ export default async function HomePage() {
               <Icon icon={appIcons.terminal} className='size-3.5' aria-hidden='true' />
               {t('common:home.firstMove', 'คำสั่งแรก')}
             </div>
-            <code className='mt-3 block overflow-x-auto font-mono text-xs leading-6 whitespace-nowrap'>
-              pnpm generate
-            </code>
+            <code className='mt-3 block overflow-x-auto font-mono text-xs leading-6 whitespace-nowrap'>pnpm dev</code>
           </div>
         </aside>
       </section>

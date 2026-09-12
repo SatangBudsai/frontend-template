@@ -2,6 +2,8 @@
 
 A runnable Next.js 16 foundation with React Server Components, Tailwind CSS v4, source-owned shadcn/ui, Iconify, Swagger-generated Axios clients, memory-only JWE authentication, TanStack Query, Redux Toolkit, Thai/English Tolgee localization, system-aware themes, route fallbacks, tests, and CI.
 
+`next-themes@0.4.6` is patched through pnpm so its SSR bootstrap script is not rendered again during React 19 client remounts. This keeps no-flash theme initialization while avoiding the React client-script warning. Remove `patches/next-themes@0.4.6.patch` and its `patchedDependencies` entry after upgrading to an upstream release that includes the same fix.
+
 Thai routes use IBM Plex Sans Thai across body, heading, control, and Thai fallback text; English routes retain Geist. The mono stack keeps Geist Mono for technical text and falls back to IBM Plex Sans Thai for Thai glyphs.
 
 ## Start

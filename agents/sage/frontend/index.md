@@ -14,3 +14,5 @@
 - [Use Iconify for template icons](decisions/use-iconify-template-icons.md) · proposed · warn
 - [Prefix unlocalized paths with the saved locale](decisions/prefix-paths-with-saved-locale.md) · proposed · warn
 - [Keep auth tokens out of persistent client state](decisions/keep-auth-tokens-out-of-persistent-client-state.md) · proposed · warn
+- [Keep the next-themes bootstrap script server-only](decisions/keep-next-themes-bootstrap-server-only.md) · proposed · warn
+- [Use IBM Plex Sans Thai for Thai locale routes](decisions/use-ibm-plex-sans-thai.md) · proposed · warn

@@ -41,6 +41,14 @@ test('shares the site navigation with auth and applies the Thai font stack', asy
 })
 
 test('toggles and persists the color theme', async ({ page }) => {
+  const clientScriptWarnings: string[] = []
+
+  page.on('console', message => {
+    if (message.text().includes('Encountered a script tag while rendering React component')) {
+      clientScriptWarnings.push(message.text())
+    }
+  })
+
   await page.emulateMedia({ colorScheme: 'light' })
   await page.goto('/en')
 
@@ -53,4 +61,5 @@ test('toggles and persists the color theme', async ({ page }) => {
   await expect(page.locator('html')).toHaveClass(/dark/)
   await page.reload()
   await expect(page.locator('html')).toHaveClass(/dark/)
+  expect(clientScriptWarnings).toEqual([])
 })
