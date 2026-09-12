@@ -51,8 +51,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         dispatch(sessionReceived(session.account))
       },
       async logout(scope) {
-        await authSessionClient.logout(scope)
-        dispatch(sessionCleared())
+        try {
+          await authSessionClient.logout(scope)
+        } finally {
+          dispatch(sessionCleared())
+        }
       }
     }),
     [dispatch]

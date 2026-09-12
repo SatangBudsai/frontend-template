@@ -2,6 +2,8 @@
 
 A runnable Next.js 16 foundation with React Server Components, Tailwind CSS v4, source-owned shadcn/ui, Iconify, Swagger-generated Axios clients, memory-only JWE authentication, TanStack Query, Redux Toolkit, Thai/English Tolgee localization, system-aware themes, route fallbacks, tests, and CI.
 
+Thai routes use IBM Plex Sans Thai across body, heading, control, and Thai fallback text; English routes retain Geist. The mono stack keeps Geist Mono for technical text and falls back to IBM Plex Sans Thai for Thai glyphs.
+
 ## Start
 
 ```bash
@@ -17,7 +19,7 @@ Tolgee remains optional because translations are bundled. The UI can render with
 
 TanStack Query is ready for interactive client-side server state. Redux Toolkit is ready for global mutable client state through a request-safe provider. Do not copy the same remote data into both stores.
 
-Icons use the shared Iconify wrapper at `src/components/ui/icon.tsx`; starter icon IDs live in `src/config/icons.ts`. `lucide-react` is not included.
+Icons use the shared Iconify wrapper at `src/components/ui/icon.tsx`; Lucide collection IDs live in `src/config/icons.ts`. `src/config/icon-data.ts` contains only those icons as build-time generated SVG data, so deployed pages render them immediately without calling the Iconify API. `lucide-react` is not included.
 
 ## Generated API types
 
@@ -47,12 +49,14 @@ Remote Tolgee credentials are optional and belong in `.env.local` or CI secrets.
 ## Add UI components
 
 ```bash
-pnpm dlx shadcn@latest add card input dialog
+pnpm ui:add card input dialog
 ```
 
 Generated source lives in `src/components/ui` and shares `src/lib/utils.ts`.
 
-The shadcn CLI does not currently offer Iconify as an icon-library target. After adding a component that contains icons, replace its generated icon imports with the shared `Icon` wrapper and remove any icon dependency the CLI added.
+The shadcn CLI does not currently offer Iconify as an icon-library target. Always use `pnpm ui:add`: the wrapper runs `shadcn add`, rewrites generated Lucide JSX to the shared `Icon` component, adds missing `lucide:*` IDs to `appIcons`, regenerates the offline icon bundle, removes the temporary `lucide-react` dependency, formats the result, and fails if a generated usage cannot be converted safely. `pnpm ui:check-icons` enforces the import rule without changing files and runs in CI.
+
+When editing `appIcons` manually, run `pnpm icons:generate`. `pnpm dev` also regenerates the data before startup, while `pnpm build` and CI fail if the tracked offline bundle is stale.
 
 ## Quality checks
 
@@ -62,6 +66,8 @@ Playwright is the only test runner. It runs the repository contracts and real Ch
 pnpm format:check
 pnpm lint
 pnpm typecheck
+pnpm ui:check-icons
+pnpm icons:check
 pnpm generate
 pnpm i18n:check
 pnpm test
@@ -75,14 +81,19 @@ langs/                     # Tracked Tolgee namespaces by locale
 src/
   api/example-service/     # Minimal standalone code-generation example
   api/api-template/        # Connected auth/RBAC contract, client, and auth transport policy
-  app/[locale]/            # Thai/English routes and boundaries
-  components/              # Shared components and source-owned shadcn/ui
+  app/[locale]/            # Locale providers and route-level boundaries
+    (site)/                # Shared public site shell with landing and auth routes
+  components/layout/       # Shared navbar and auth-aware account navigation
+  components/auth/         # Login, registration, account, roles, and session UI
+  components/ui/           # Source-owned shadcn/ui primitives
   config/icons.ts          # Project-wide Iconify icon IDs
   i18n/                    # next-intl routing and navigation
   providers/               # Request-safe client provider boundaries
   store/                   # Redux store factory and typed hooks
   tolgee/                  # Shared, server, and client Tolgee integration
+scripts/icons/             # Offline Iconify subset generator
 scripts/tolgee/            # Extractor and pull-to-repository synchronizer
+scripts/shadcn/             # Safe shadcn add wrapper with Iconify conversion
 tests/                     # Playwright browser E2E, contract, and architecture tests
 .github/workflows/         # CI quality gate
 ```

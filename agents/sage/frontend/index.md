@@ -3,6 +3,7 @@
 ## Decisions
 
 - [Own shadcn/ui component source](decisions/own-shadcn-component-source.md) · proposed · advise
+- [Reuse UI components before custom controls](decisions/reuse-ui-components-before-custom-controls.md) · proposed · warn
 - [Keep provider integrations optional](decisions/keep-provider-integrations-optional.md) · proposed · advise
 - [Ship selected integrations as runnable foundations](decisions/ship-runnable-integration-foundations.md) · proposed · advise · supersedes the optional-only baseline
 - [Pulled translations update tracked catalogs and source fallbacks](decisions/pulled-translations-update-repository-source.md) · proposed · warn

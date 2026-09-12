@@ -3,6 +3,7 @@
 import { useTolgee } from '@tolgee/react'
 import { useTransition } from 'react'
 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import { defaultLocale, isAppLocale } from '@/i18n/routing'
 
@@ -21,28 +22,21 @@ export function LanguageSwitcher({ label, thaiLabel, englishLabel }: LanguageSwi
   const currentLocale = language && isAppLocale(language) ? language : defaultLocale
 
   return (
-    <label className='relative'>
-      <span className='sr-only'>{label}</span>
-      <select
-        className='min-h-11 appearance-none rounded-lg border border-border bg-background py-2 pr-8 pl-3 text-sm font-medium text-foreground transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-wait disabled:opacity-60'
-        value={currentLocale}
-        disabled={isPending}
-        aria-label={label}
-        onChange={event => {
-          const locale = event.target.value
+    <Select
+      value={currentLocale}
+      disabled={isPending}
+      onValueChange={locale => {
+        if (!locale || !isAppLocale(locale)) return
 
-          if (!isAppLocale(locale)) return
-
-          startTransition(() => router.replace(pathname, { locale }))
-        }}>
-        <option value='th'>{thaiLabel}</option>
-        <option value='en'>{englishLabel}</option>
-      </select>
-      <span
-        className='pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-xs text-muted-foreground'
-        aria-hidden='true'>
-        ↓
-      </span>
-    </label>
+        startTransition(() => router.replace(pathname, { locale }))
+      }}>
+      <SelectTrigger className='min-h-11 w-24' aria-label={label}>
+        <SelectValue>{currentLocale === 'th' ? thaiLabel : englishLabel}</SelectValue>
+      </SelectTrigger>
+      <SelectContent align='end' alignItemWithTrigger={false} className='min-w-32'>
+        <SelectItem value='th'>{thaiLabel}</SelectItem>
+        <SelectItem value='en'>{englishLabel}</SelectItem>
+      </SelectContent>
+    </Select>
   )
 }

@@ -41,6 +41,12 @@ jobs:
       - name: Type-check
         run: pnpm typecheck
 
+      - name: Verify Iconify-only component source
+        run: pnpm ui:check-icons
+
+      - name: Verify bundled icon data
+        run: pnpm icons:check
+
       - name: Generate API client
         run: |
           pnpm generate
