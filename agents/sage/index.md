@@ -16,6 +16,7 @@ agents/sage/
 ## Domains
 
 - [frontend](frontend/) — UI foundation and source-ownership decisions
+- [testing](testing/) — repository test-tooling decisions
 - [protocol](protocol/) — Sage execution policy
 - [sage-product](sage-product/) — Sage control-plane decisions
 

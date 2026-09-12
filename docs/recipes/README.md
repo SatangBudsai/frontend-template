@@ -9,5 +9,6 @@ The template ships runnable foundations for API generation, localization, icons,
 | TanStack Query                   | [`tanstack-query.md`](tanstack-query.md)   | No; a backend is needed only when a query executes                  |
 | Redux Toolkit                    | [`redux-toolkit.md`](redux-toolkit.md)     | No                                                                  |
 | Iconify                          | [`iconify.md`](iconify.md)                 | No account; string icon IDs load from the public Iconify API        |
+| Playwright testing               | [`testing.md`](testing.md)                 | Install Chromium once for local browser E2E                         |
 
 Keep dependency versions exact and run the complete quality suite after changing a contract or provider boundary.

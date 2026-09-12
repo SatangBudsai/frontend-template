@@ -1,8 +1,7 @@
-import assert from 'node:assert/strict'
+import { expect, test } from '@playwright/test'
 import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
-import test from 'node:test'
 
 import {
   flattenTranslations,
@@ -20,7 +19,7 @@ test('every namespace has matching Thai and English translation keys', async () 
     .filter(entry => entry.isDirectory())
     .map(entry => entry.name)
 
-  assert.ok(namespaces.includes('common'))
+  expect(namespaces).toContain('common')
 
   for (const namespace of namespaces) {
     const [englishSource, thaiSource] = await Promise.all([
@@ -30,10 +29,10 @@ test('every namespace has matching Thai and English translation keys', async () 
     const english = flattenTranslations(JSON.parse(englishSource))
     const thai = flattenTranslations(JSON.parse(thaiSource))
 
-    assert.deepEqual(Object.keys(thai).sort(), Object.keys(english).sort(), namespace)
+    expect(Object.keys(thai).sort(), namespace).toEqual(Object.keys(english).sort())
 
     for (const [key, value] of Object.entries({ ...english, ...thai })) {
-      assert.ok(value.trim(), `Translation must not be empty: ${namespace}:${key}`)
+      expect(value.trim(), `Translation must not be empty: ${namespace}:${key}`).not.toBe('')
     }
   }
 })
@@ -44,23 +43,23 @@ test('locale routing defaults to Thai, remembers the choice, and always uses a p
     readProjectFile('src/proxy.ts')
   ])
 
-  assert.match(routingSource, /locales = \['th', 'en'\]/)
-  assert.match(routingSource, /defaultLocale[^\n]+ = 'th'/)
-  assert.match(routingSource, /localeDetection: false/)
-  assert.match(routingSource, /name: 'NEXT_LOCALE'/)
-  assert.match(routingSource, /maxAge: 60 \* 60 \* 24 \* 365/)
-  assert.match(routingSource, /localePrefix: 'always'/)
-  assert.match(proxySource, /request\.cookies\.get\(localeCookie\.name\)/)
-  assert.match(proxySource, /resolvePreferredLocale\(request\.nextUrl\.pathname, savedLocale\)/)
-  assert.match(proxySource, /createMiddleware\(\{ \.\.\.routing, defaultLocale: preferredLocale \}\)/)
-  assert.match(proxySource, /response\.cookies\.set\(localeCookie\.name/)
+  expect(routingSource).toMatch(/locales = \['th', 'en'\]/)
+  expect(routingSource).toMatch(/defaultLocale[^\n]+ = 'th'/)
+  expect(routingSource).toMatch(/localeDetection: false/)
+  expect(routingSource).toMatch(/name: 'NEXT_LOCALE'/)
+  expect(routingSource).toMatch(/maxAge: 60 \* 60 \* 24 \* 365/)
+  expect(routingSource).toMatch(/localePrefix: 'always'/)
+  expect(proxySource).toMatch(/request\.cookies\.get\(localeCookie\.name\)/)
+  expect(proxySource).toMatch(/resolvePreferredLocale\(request\.nextUrl\.pathname, savedLocale\)/)
+  expect(proxySource).toMatch(/createMiddleware\(\{ \.\.\.routing, defaultLocale: preferredLocale \}\)/)
+  expect(proxySource).toMatch(/response\.cookies\.set\(localeCookie\.name/)
 })
 
 test('locale preference uses an explicit prefix, then a saved locale, then Thai', () => {
-  assert.equal(resolvePreferredLocale('/en/projects/42', 'th'), 'en')
-  assert.equal(resolvePreferredLocale('/projects/42', 'en'), 'en')
-  assert.equal(resolvePreferredLocale('/main'), 'th')
-  assert.equal(resolvePreferredLocale('/main', 'unsupported'), 'th')
+  expect(resolvePreferredLocale('/en/projects/42', 'th')).toBe('en')
+  expect(resolvePreferredLocale('/projects/42', 'en')).toBe('en')
+  expect(resolvePreferredLocale('/main')).toBe('th')
+  expect(resolvePreferredLocale('/main', 'unsupported')).toBe('th')
 })
 
 test('Tolgee stays behind an explicit provider with generated static imports', async () => {
@@ -72,15 +71,15 @@ test('Tolgee stays behind an explicit provider with generated static imports', a
   ])
   const implementation = `${sharedSource}\n${clientSource}\n${switcherSource}`
 
-  assert.doesNotMatch(implementation, /globalThis\.fetch\s*=/)
-  assert.doesNotMatch(implementation, /changeLanguage\s*\(/)
-  assert.match(sharedSource, /staticData/)
-  assert.match(sharedSource, /NODE_ENV === 'development' && enableDevTools && apiKey && apiUrl/)
-  assert.match(sharedSource, /useRemoteDevelopment \? \{ apiKey, apiUrl \} : \{\}/)
-  assert.match(generatedConfigSource, /'en:common'/)
-  assert.match(generatedConfigSource, /'th:common'/)
-  assert.match(generatedConfigSource, /langs\/common\/en\.json/)
-  assert.match(clientSource, /permanentChange/)
+  expect(implementation).not.toMatch(/globalThis\.fetch\s*=/)
+  expect(implementation).not.toMatch(/changeLanguage\s*\(/)
+  expect(sharedSource).toMatch(/staticData/)
+  expect(sharedSource).toMatch(/NODE_ENV === 'development' && enableDevTools && apiKey && apiUrl/)
+  expect(sharedSource).toMatch(/useRemoteDevelopment \? \{ apiKey, apiUrl \} : \{\}/)
+  expect(generatedConfigSource).toMatch(/'en:common'/)
+  expect(generatedConfigSource).toMatch(/'th:common'/)
+  expect(generatedConfigSource).toMatch(/langs\/common\/en\.json/)
+  expect(clientSource).toMatch(/permanentChange/)
 })
 
 test('pull chains the remote fetch into deterministic repository generation', async () => {
@@ -99,37 +98,36 @@ test('pull chains the remote fetch into deterministic repository generation', as
     'i18n:push',
     'i18n:push-force'
   ]) {
-    assert.ok(manifest.scripts?.[script], `Missing package script: ${script}`)
+    expect(manifest.scripts?.[script], `Missing package script: ${script}`).toBeTruthy()
   }
 
-  assert.match(manifest.scripts?.['i18n:pull'] ?? '', /i18n:pull:remote && pnpm i18n:generate/)
-  assert.match(manifest.scripts?.['i18n:generate'] ?? '', /sync-repository\.mts --write/)
-  assert.match(manifest.scripts?.['i18n:check'] ?? '', /sync-repository\.mts/)
-
-  assert.equal(manifest.dependencies?.['next-intl'], '4.14.3')
-  assert.equal(manifest.dependencies?.['@tolgee/react'], '7.2.1')
-  assert.equal(manifest.devDependencies?.['@tolgee/cli'], '2.20.0')
+  expect(manifest.scripts?.['i18n:pull'] ?? '').toMatch(/i18n:pull:remote && pnpm i18n:generate/)
+  expect(manifest.scripts?.['i18n:generate'] ?? '').toMatch(/sync-repository\.mts --write/)
+  expect(manifest.scripts?.['i18n:check'] ?? '').toMatch(/sync-repository\.mts/)
+  expect(manifest.dependencies?.['next-intl']).toBe('4.14.3')
+  expect(manifest.dependencies?.['@tolgee/react']).toBe('7.2.1')
+  expect(manifest.devDependencies?.['@tolgee/cli']).toBe('2.20.0')
 })
 
 test('repository synchronization updates explicit source fallbacks safely', () => {
   const translations = new Map([
-    ['common:greeting', "สวัสดี 'คุณ'"],
-    ['common:multiline', 'บรรทัดหนึ่ง\nบรรทัดสอง']
+    ['common:greeting', "Hello 'friend'"],
+    ['common:multiline', 'Line one\nLine two']
   ])
   const source = `const first = t('common:greeting', 'Old')\nconst second = t("common:multiline", "Old")`
   const result = updateTranslationDefaults(source, translations)
 
-  assert.equal(result.fallbacksChanged, 2)
-  assert.deepEqual(result.missingKeys, [])
-  assert.match(result.source, /t\('common:greeting', 'สวัสดี \\'คุณ\\''\)/)
-  assert.match(result.source, /t\("common:multiline", "บรรทัดหนึ่ง\\nบรรทัดสอง"\)/)
+  expect(result.fallbacksChanged).toBe(2)
+  expect(result.missingKeys).toEqual([])
+  expect(result.source).toContain(`t('common:greeting', 'Hello \\'friend\\'')`)
+  expect(result.source).toContain('t("common:multiline", "Line one\\nLine two")')
 })
 
 test('repository synchronization reports source keys missing from local catalogs', () => {
   const result = updateTranslationDefaults(`t('feature:missing.key', 'Fallback')`, new Map())
 
-  assert.deepEqual(result.missingKeys, ['feature:missing.key'])
-  assert.equal(result.fallbacksChanged, 0)
+  expect(result.missingKeys).toEqual(['feature:missing.key'])
+  expect(result.fallbacksChanged).toBe(0)
 })
 
 test('repository synchronization writes pulled values into generated code and source fallbacks', async () => {
@@ -141,7 +139,7 @@ test('repository synchronization writes pulled values into generated code and so
       mkdir(join(fixtureRoot, 'src/tolgee'), { recursive: true })
     ])
     await Promise.all([
-      writeFile(join(fixtureRoot, 'langs/common/th.json'), '{"greeting":"สวัสดี"}\n', 'utf8'),
+      writeFile(join(fixtureRoot, 'langs/common/th.json'), '{"greeting":"Local greeting"}\n', 'utf8'),
       writeFile(join(fixtureRoot, 'langs/common/en.json'), '{"greeting":"Hello"}\n', 'utf8'),
       writeFile(join(fixtureRoot, 'src/tolgee/config.ts'), '', 'utf8'),
       writeFile(join(fixtureRoot, 'src/page.ts'), "const value = t('common:greeting', 'Old value')\n", 'utf8')
@@ -153,10 +151,10 @@ test('repository synchronization writes pulled values into generated code and so
       readFile(join(fixtureRoot, 'src/tolgee/config.ts'), 'utf8')
     ])
 
-    assert.equal(result.fallbacksChanged, 1)
-    assert.match(source, /t\('common:greeting', 'สวัสดี'\)/)
-    assert.match(generatedConfig, /langs\/common\/th\.json/)
-    await assert.doesNotReject(syncTranslationRepository({ write: false, rootDirectory: fixtureRoot }))
+    expect(result.fallbacksChanged).toBe(1)
+    expect(source).toContain("t('common:greeting', 'Local greeting')")
+    expect(generatedConfig).toMatch(/langs\/common\/th\.json/)
+    await expect(syncTranslationRepository({ write: false, rootDirectory: fixtureRoot })).resolves.toBeDefined()
   } finally {
     await rm(fixtureRoot, { recursive: true, force: true })
   }

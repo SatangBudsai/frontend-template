@@ -1,7 +1,6 @@
-import assert from 'node:assert/strict'
+import { expect, test } from '@playwright/test'
 import { readdir, readFile } from 'node:fs/promises'
 import { extname, join, relative, resolve } from 'node:path'
-import test from 'node:test'
 
 async function collectSourceFiles(directory: string): Promise<string[]> {
   const entries = await readdir(directory, { withFileTypes: true })
@@ -23,9 +22,9 @@ test('checked Swagger example is a valid template contract', async () => {
     paths?: Record<string, { get?: { responses?: Record<string, unknown> } }>
   }
 
-  assert.match(contract.openapi ?? '', /^3\./)
-  assert.equal(contract.info?.title, 'Frontend Template API')
-  assert.ok(contract.paths?.['/health']?.get?.responses?.['200'])
+  expect(contract.openapi ?? '').toMatch(/^3\./)
+  expect(contract.info?.title).toBe('Frontend Template API')
+  expect(contract.paths?.['/health']?.get?.responses?.['200']).toBeTruthy()
 })
 
 test('application source does not import generated API internals directly', async () => {
@@ -34,22 +33,19 @@ test('application source does not import generated API internals directly', asyn
 
   for (const path of files) {
     const projectPath = relative(resolve(), path).replaceAll('\\', '/')
-
-    if (/^src\/api\/[^/]+\/(?:apiGenerated|index)\.ts$/.test(projectPath)) {
-      continue
-    }
+    if (/^src\/api\/[^/]+\/(?:apiGenerated|index)\.ts$/.test(projectPath)) continue
 
     const source = await readFile(path, 'utf8')
-    assert.doesNotMatch(source, /(?:@\/api\/[^'"\n]+\/|from ['"]\.\.?\/[^'"\n]*?)apiGenerated/, projectPath)
+    expect(source, projectPath).not.toMatch(/(?:@\/api\/[^'"\n]+\/|from ['"]\.\.?\/[^'"\n]*?)apiGenerated/)
   }
 })
 
 test('generated service client exposes the template operation', async () => {
   const generated = await readFile(resolve('src/api/example-service/apiGenerated.ts'), 'utf8')
 
-  assert.match(generated, /export class Api/)
-  assert.match(generated, /getHealth:/)
-  assert.match(generated, /path: `\/health`/)
+  expect(generated).toMatch(/export class Api/)
+  expect(generated).toMatch(/getHealth:/)
+  expect(generated).toMatch(/path: `\/health`/)
 })
 
 test('package exposes one Axios API generation command', async () => {
@@ -59,24 +55,22 @@ test('package exposes one Axios API generation command', async () => {
     devDependencies?: Record<string, string>
   }
 
-  assert.ok(manifest.scripts?.generate)
-
+  expect(manifest.scripts?.generate).toBeTruthy()
   for (const obsoleteScript of ['api:validate', 'api:sync', 'api:generate', 'api:check', 'api:refresh']) {
-    assert.equal(manifest.scripts?.[obsoleteScript], undefined, `Unexpected package script: ${obsoleteScript}`)
+    expect(manifest.scripts?.[obsoleteScript], `Unexpected package script: ${obsoleteScript}`).toBeUndefined()
   }
 
-  assert.match(manifest.scripts.generate, /swagger-typescript-api generate/)
-  assert.match(manifest.scripts.generate, /src\/api\/example-service\/example-service\.swagger\.json/)
-  assert.match(manifest.scripts.generate, /--axios/)
-  assert.match(manifest.scripts.generate, /--unwrap-response-data/)
-
-  assert.equal(manifest.dependencies?.['axios'], '1.18.1')
-  assert.equal(manifest.devDependencies?.['swagger-typescript-api'], '13.12.6')
+  expect(manifest.scripts?.generate).toMatch(/swagger-typescript-api generate/)
+  expect(manifest.scripts?.generate).toMatch(/src\/api\/example-service\/example-service\.swagger\.json/)
+  expect(manifest.scripts?.generate).toMatch(/--axios/)
+  expect(manifest.scripts?.generate).toMatch(/--unwrap-response-data/)
+  expect(manifest.dependencies?.axios).toBe('1.18.1')
+  expect(manifest.devDependencies?.['swagger-typescript-api']).toBe('13.12.6')
 })
 
 test('service wrapper fails clearly when its runtime base URL is missing', async () => {
   const source = await readFile(resolve('src/api/example-service/index.ts'), 'utf8')
 
-  assert.match(source, /NEXT_PUBLIC_SERVICE\?\.trim\(\)/)
-  assert.match(source, /NEXT_PUBLIC_SERVICE is required before using exampleService/)
+  expect(source).toMatch(/NEXT_PUBLIC_SERVICE\?\.trim\(\)/)
+  expect(source).toMatch(/NEXT_PUBLIC_SERVICE is required before using exampleService/)
 })

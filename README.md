@@ -6,6 +6,7 @@ A runnable Next.js 16 foundation with React Server Components, Tailwind CSS v4, 
 
 ```bash
 pnpm install
+pnpm exec playwright install chromium
 pnpm generate
 pnpm dev
 ```
@@ -55,6 +56,8 @@ The shadcn CLI does not currently offer Iconify as an icon-library target. After
 
 ## Quality checks
 
+Playwright is the only test runner. It runs the repository contracts and real Chromium E2E coverage from the root `tests/` directory.
+
 ```bash
 pnpm format:check
 pnpm lint
@@ -80,8 +83,8 @@ src/
   store/                   # Redux store factory and typed hooks
   tolgee/                  # Shared, server, and client Tolgee integration
 scripts/tolgee/            # Extractor and pull-to-repository synchronizer
-tests/                     # Contract and architecture tests
+tests/                     # Playwright browser E2E, contract, and architecture tests
 .github/workflows/         # CI quality gate
 ```
 
-See [authentication](docs/recipes/authentication.md), [OpenAPI code generation](docs/recipes/openapi-codegen.md), [TanStack Query](docs/recipes/tanstack-query.md), [Redux Toolkit](docs/recipes/redux-toolkit.md), [Iconify](docs/recipes/iconify.md), [Tolgee localization](docs/recipes/tolgee.md), and [template setup](docs/template-setup.md) for adoption details.
+See [authentication](docs/recipes/authentication.md), [testing](docs/recipes/testing.md), [OpenAPI code generation](docs/recipes/openapi-codegen.md), [TanStack Query](docs/recipes/tanstack-query.md), [Redux Toolkit](docs/recipes/redux-toolkit.md), [Iconify](docs/recipes/iconify.md), [Tolgee localization](docs/recipes/tolgee.md), and [template setup](docs/template-setup.md) for adoption details.

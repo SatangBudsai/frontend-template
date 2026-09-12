@@ -6,6 +6,9 @@
 # Tests
 /coverage
 /.tolgee-backup
+/playwright-report/
+/test-results/
+/blob-report/
 
 # Next.js
 /.next/

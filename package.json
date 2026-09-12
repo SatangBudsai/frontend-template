@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "test": "playwright test",
     "generate": "swagger-typescript-api generate -p ./src/api/example-service/example-service.swagger.json -o ./src/api/example-service -n apiGenerated.ts --axios --unwrap-response-data && swagger-typescript-api generate -p ./src/api/api-template/api-template.swagger.json -o ./src/api/api-template -n apiGenerated.ts --axios --unwrap-response-data && prettier --write \"src/api/example-service/*.ts\" \"src/api/api-template/*.ts\"",
     "i18n:extract": "tolgee extract check",
     "i18n:generate": "node --experimental-strip-types scripts/tolgee/sync-repository.mts --write && prettier --write \"langs/**/*.json\" \"src/tolgee/config.ts\" \"src/**/*.{ts,tsx}\"",
@@ -46,6 +46,7 @@
     "tw-animate-css": "1.4.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "@tailwindcss/postcss": "4.3.3",
     "@tolgee/cli": "2.20.0",
     "@types/node": "22.20.2",

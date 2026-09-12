@@ -1,6 +1,5 @@
-import assert from 'node:assert/strict'
+import { expect, test } from '@playwright/test'
 import { readFile, readdir } from 'node:fs/promises'
-import test from 'node:test'
 
 async function readProjectFile(path: string) {
   return readFile(new URL(`../${path}`, import.meta.url), 'utf8')
@@ -17,20 +16,18 @@ async function readSourceTree() {
 }
 
 test('shadcn configuration points to the source-owned UI directory', async () => {
-  const source = await readProjectFile('components.json')
-  const config = JSON.parse(source) as {
+  const config = JSON.parse(await readProjectFile('components.json')) as {
     rsc: boolean
     aliases: { ui: string; utils: string }
   }
 
-  assert.equal(config.rsc, true)
-  assert.equal(config.aliases.ui, '@/components/ui')
-  assert.equal(config.aliases.utils, '@/lib/utils')
+  expect(config.rsc).toBe(true)
+  expect(config.aliases.ui).toBe('@/components/ui')
+  expect(config.aliases.utils).toBe('@/lib/utils')
 })
 
 test('package manifest does not depend on HeroUI', async () => {
-  const source = await readProjectFile('package.json')
-  assert.doesNotMatch(source, /@heroui|@nextui/i)
+  expect(await readProjectFile('package.json')).not.toMatch(/@heroui|@nextui/i)
 })
 
 test('theme support is wired through the root layout', async () => {
@@ -40,9 +37,9 @@ test('theme support is wired through the root layout', async () => {
   ])
   const manifest = JSON.parse(manifestSource) as { dependencies?: Record<string, string> }
 
-  assert.equal(manifest.dependencies?.['next-themes'], '0.4.6')
-  assert.match(layoutSource, /suppressHydrationWarning/)
-  assert.match(layoutSource, /<ThemeProvider[^>]+defaultTheme='system'[^>]+enableSystem/)
+  expect(manifest.dependencies?.['next-themes']).toBe('0.4.6')
+  expect(layoutSource).toMatch(/suppressHydrationWarning/)
+  expect(layoutSource).toMatch(/<ThemeProvider[^>]+defaultTheme='system'[^>]+enableSystem/)
 })
 
 test('TanStack Query and Redux use request-safe provider boundaries', async () => {
@@ -57,17 +54,16 @@ test('TanStack Query and Redux use request-safe provider boundaries', async () =
     ])
   const manifest = JSON.parse(manifestSource) as { dependencies?: Record<string, string> }
 
-  assert.equal(manifest.dependencies?.['@tanstack/react-query'], '5.102.8')
-  assert.equal(manifest.dependencies?.['@reduxjs/toolkit'], '2.12.0')
-  assert.equal(manifest.dependencies?.['react-redux'], '9.3.0')
-  assert.match(queryProviderSource, /environmentManager\.isServer\(\)/)
-  assert.match(queryProviderSource, /staleTime: 60_000/)
-  assert.match(reduxProviderSource, /useState\(makeStore\)/)
-  assert.match(storeSource, /export function makeStore\(\)/)
-  assert.doesNotMatch(storeSource, /export const store\s*=/)
-  assert.match(hooksSource, /useDispatch\.withTypes<AppDispatch>\(\)/)
-  assert.match(
-    layoutSource,
+  expect(manifest.dependencies?.['@tanstack/react-query']).toBe('5.102.8')
+  expect(manifest.dependencies?.['@reduxjs/toolkit']).toBe('2.12.0')
+  expect(manifest.dependencies?.['react-redux']).toBe('9.3.0')
+  expect(queryProviderSource).toMatch(/environmentManager\.isServer\(\)/)
+  expect(queryProviderSource).toMatch(/staleTime: 60_000/)
+  expect(reduxProviderSource).toMatch(/useState\(makeStore\)/)
+  expect(storeSource).toMatch(/export function makeStore\(\)/)
+  expect(storeSource).not.toMatch(/export const store\s*=/)
+  expect(hooksSource).toMatch(/useDispatch\.withTypes<AppDispatch>\(\)/)
+  expect(layoutSource).toMatch(
     /<ReduxProvider>\s*<QueryProvider>\s*<AuthProvider>\{children\}<\/AuthProvider>\s*<\/QueryProvider>\s*<\/ReduxProvider>/
   )
 })
@@ -83,12 +79,12 @@ test('Iconify is the shared icon runtime and Lucide is absent', async () => {
   const manifest = JSON.parse(manifestSource) as { dependencies?: Record<string, string> }
   const components = JSON.parse(componentsSource) as { iconLibrary?: string }
 
-  assert.equal(manifest.dependencies?.['@iconify/react'], '6.0.2')
-  assert.equal(manifest.dependencies?.['lucide-react'], undefined)
-  assert.equal(components.iconLibrary, undefined)
-  assert.match(iconSource, /from '@iconify\/react'/)
-  assert.match(iconConfigSource, /material-symbols:/)
-  assert.doesNotMatch(applicationSource, /lucide-react/)
+  expect(manifest.dependencies?.['@iconify/react']).toBe('6.0.2')
+  expect(manifest.dependencies?.['lucide-react']).toBeUndefined()
+  expect(components.iconLibrary).toBeUndefined()
+  expect(iconSource).toMatch(/from '@iconify\/react'/)
+  expect(iconConfigSource).toMatch(/material-symbols:/)
+  expect(applicationSource).not.toMatch(/lucide-react/)
 })
 
 test('App Router fallback boundaries are present', async () => {
@@ -100,26 +96,24 @@ test('App Router fallback boundaries are present', async () => {
     readProjectFile('src/app/[locale]/[...rest]/page.tsx')
   ])
 
-  assert.match(loadingSource, /aria-busy='true'/)
-  assert.match(errorSource, /'use client'/)
-  assert.match(errorSource, /reset/)
-  assert.match(globalErrorSource, /<html lang='en'>/)
-  assert.match(globalErrorSource, /global-error\.module\.css/)
-  assert.match(globalErrorSource, /role='alert'/)
-  assert.match(notFoundSource, /href='\/'/)
-  assert.match(catchAllSource, /notFound\(\)/)
+  expect(loadingSource).toMatch(/aria-busy='true'/)
+  expect(errorSource).toMatch(/'use client'/)
+  expect(errorSource).toMatch(/reset/)
+  expect(globalErrorSource).toMatch(/<html lang='en'>/)
+  expect(globalErrorSource).toMatch(/global-error\.module\.css/)
+  expect(globalErrorSource).toMatch(/role='alert'/)
+  expect(notFoundSource).toMatch(/href='\/'/)
+  expect(catchAllSource).toMatch(/notFound\(\)/)
 })
 
 test('CI runs the complete documented quality gate', async () => {
   const workflowSource = await readProjectFile('.github/workflows/quality.yml')
 
-  assert.match(workflowSource, /permissions:\s+contents: read/)
-
+  expect(workflowSource).toMatch(/permissions:\s+contents: read/)
   for (const command of ['format:check', 'lint', 'typecheck', 'test', 'build']) {
-    assert.match(workflowSource, new RegExp(`run: pnpm ${command.replace(':', '\\:')}`))
+    expect(workflowSource).toMatch(new RegExp(`run: pnpm ${command.replace(':', '\\:')}`))
   }
-
-  assert.doesNotMatch(workflowSource, /playwright|test:e2e/i)
+  expect(workflowSource).toMatch(/playwright install --with-deps chromium/)
 })
 
 test('integration recipes document the implemented boundaries', async () => {
@@ -128,12 +122,11 @@ test('integration recipes document the implemented boundaries', async () => {
     readProjectFile('docs/recipes/tolgee.md')
   ])
 
-  assert.match(openApiSource, /pnpm generate/i)
-  assert.match(openApiSource, /src\/api\/example-service/i)
-  assert.match(openApiSource, /--axios/)
-  assert.match(openApiSource, /contract/i)
-
-  assert.match(tolgeeSource, /namespace/i)
-  assert.match(tolgeeSource, /Do not call `changeLanguage\(\)` during render/)
-  assert.match(tolgeeSource, /TOLGEE_API_KEY/)
+  expect(openApiSource).toMatch(/pnpm generate/i)
+  expect(openApiSource).toMatch(/src\/api\/example-service/i)
+  expect(openApiSource).toMatch(/--axios/)
+  expect(openApiSource).toMatch(/contract/i)
+  expect(tolgeeSource).toMatch(/namespace/i)
+  expect(tolgeeSource).toMatch(/Do not call `changeLanguage\(\)` during render/)
+  expect(tolgeeSource).toMatch(/TOLGEE_API_KEY/)
 })

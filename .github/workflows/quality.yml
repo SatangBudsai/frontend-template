@@ -49,6 +49,9 @@ jobs:
       - name: Verify translations
         run: pnpm i18n:check
 
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
       - name: Test
         run: pnpm test
 
