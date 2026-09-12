@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "title": "Sample item one",
+      "description": "Example data served from the public directory.",
+      "active": true
+    },
+    {
+      "id": 2,
+      "title": "Sample item two",
+      "description": "Use this file when prototyping static data fetching.",
+      "active": true
+    },
+    {
+      "id": 3,
+      "title": "Sample item three",
+      "description": "Replace these records with project-specific examples.",
+      "active": false
+    }
+  ]
+}
