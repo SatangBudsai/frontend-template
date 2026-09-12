@@ -66,7 +66,10 @@ test('TanStack Query and Redux use request-safe provider boundaries', async () =
   assert.match(storeSource, /export function makeStore\(\)/)
   assert.doesNotMatch(storeSource, /export const store\s*=/)
   assert.match(hooksSource, /useDispatch\.withTypes<AppDispatch>\(\)/)
-  assert.match(layoutSource, /<ReduxProvider>\s*<QueryProvider>\{children\}<\/QueryProvider>\s*<\/ReduxProvider>/)
+  assert.match(
+    layoutSource,
+    /<ReduxProvider>\s*<QueryProvider>\s*<AuthProvider>\{children\}<\/AuthProvider>\s*<\/QueryProvider>\s*<\/ReduxProvider>/
+  )
 })
 
 test('Iconify is the shared icon runtime and Lucide is absent', async () => {

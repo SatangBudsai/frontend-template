@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
-    "generate": "swagger-typescript-api generate -p ./src/api/example-service/example-service.swagger.json -o ./src/api/example-service -n apiGenerated.ts --axios --unwrap-response-data && prettier --write \"src/api/example-service/*.ts\"",
+    "generate": "swagger-typescript-api generate -p ./src/api/example-service/example-service.swagger.json -o ./src/api/example-service -n apiGenerated.ts --axios --unwrap-response-data && swagger-typescript-api generate -p ./src/api/api-template/api-template.swagger.json -o ./src/api/api-template -n apiGenerated.ts --axios --unwrap-response-data && prettier --write \"src/api/example-service/*.ts\" \"src/api/api-template/*.ts\"",
     "i18n:extract": "tolgee extract check",
     "i18n:generate": "node --experimental-strip-types scripts/tolgee/sync-repository.mts --write && prettier --write \"langs/**/*.json\" \"src/tolgee/config.ts\" \"src/**/*.{ts,tsx}\"",
     "i18n:check": "pnpm i18n:extract && node --experimental-strip-types scripts/tolgee/sync-repository.mts",

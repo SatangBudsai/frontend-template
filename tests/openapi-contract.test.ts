@@ -35,10 +35,7 @@ test('application source does not import generated API internals directly', asyn
   for (const path of files) {
     const projectPath = relative(resolve(), path).replaceAll('\\', '/')
 
-    if (
-      projectPath === 'src/api/example-service/apiGenerated.ts' ||
-      projectPath === 'src/api/example-service/index.ts'
-    ) {
+    if (/^src\/api\/[^/]+\/(?:apiGenerated|index)\.ts$/.test(projectPath)) {
       continue
     }
 

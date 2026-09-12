@@ -12,3 +12,4 @@
 - [Include Redux Toolkit in the reusable baseline](decisions/include-redux-toolkit-baseline.md) · proposed · advise · supersedes the Query-only baseline
 - [Use Iconify for template icons](decisions/use-iconify-template-icons.md) · proposed · warn
 - [Prefix unlocalized paths with the saved locale](decisions/prefix-paths-with-saved-locale.md) · proposed · warn
+- [Keep auth tokens out of persistent client state](decisions/keep-auth-tokens-out-of-persistent-client-state.md) · proposed · warn

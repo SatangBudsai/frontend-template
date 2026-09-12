@@ -5,11 +5,11 @@ The template follows the CMU Research Gallery client pattern with `swagger-types
 ## Structure
 
 ```text
-src/api/example-service/
+src/api/<service>/
   example-service.swagger.json # checked example and generator input
   apiGenerated.ts              # generated Axios client and DTOs; never hand-edit
   index.ts                     # stable application-facing service export
-tests/openapi-contract.test.ts      # semantic and import-boundary tests
+tests/openapi-contract.test.ts  # semantic and import-boundary tests
 ```
 
 Application code imports `@/api/example-service`. It must not import `apiGenerated.ts` directly; the service index owns base URL and future transport policy. Rename `example-service` and its exported client to the real backend service slug when starting a project.
@@ -20,7 +20,7 @@ Application code imports `@/api/example-service`. It must not import `apiGenerat
 pnpm generate
 ```
 
-`generate` reads `example-service/example-service.swagger.json`, creates the Axios client and DTOs in the same service folder, then formats the TypeScript output. The checked Swagger file is both the visible example and the reproducible generator input.
+`generate` reads the checked Swagger contracts for both the minimal example and `api-template`, creates each Axios client and DTOs in its service folder, then formats the TypeScript output. One command keeps every checked contract reproducible.
 
 `--axios` selects Axios instead of the generator's Fetch transport. `--unwrap-response-data` makes generated endpoint methods return the response body directly instead of an `AxiosResponse<T>`. Keep both flags for the same calling style as the CMU reference.
 

@@ -1,6 +1,6 @@
 # Next.js production template
 
-A runnable Next.js 16 foundation with React Server Components, Tailwind CSS v4, source-owned shadcn/ui, Iconify, a Swagger-generated Axios client, TanStack Query, Redux Toolkit, Thai/English Tolgee localization, system-aware themes, route fallbacks, tests, and CI.
+A runnable Next.js 16 foundation with React Server Components, Tailwind CSS v4, source-owned shadcn/ui, Iconify, Swagger-generated Axios clients, memory-only JWE authentication, TanStack Query, Redux Toolkit, Thai/English Tolgee localization, system-aware themes, route fallbacks, tests, and CI.
 
 ## Start
 
@@ -12,7 +12,7 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000). Every unprefixed route receives a locale prefix: `/main` becomes `/th/main` on the first visit. The language switcher stores the choice in the `NEXT_LOCALE` cookie, so later unprefixed routes use the selected locale instead.
 
-No backend or Tolgee account is required for local development. The repository includes a small OpenAPI contract and bundled translation files.
+Tolgee remains optional because translations are bundled. The UI can render without a backend; configure `SERVICE_URL` when using the included auth flow.
 
 TanStack Query is ready for interactive client-side server state. Redux Toolkit is ready for global mutable client state through a request-safe provider. Do not copy the same remote data into both stores.
 
@@ -24,7 +24,9 @@ Icons use the shared Iconify wrapper at `src/components/ui/icon.tsx`; starter ic
 pnpm generate # generate the Axios client and DTOs from Swagger
 ```
 
-Replace `src/api/example-service/example-service.swagger.json` with the backend contract, rename `example-service` to the backend service slug, update the paths in the `generate` script, and run it again. `apiGenerated.ts` is machine-owned and must not be edited manually. Application modules import `exampleService` and DTOs through that folder's `index.ts`, not from `apiGenerated.ts` directly.
+The repository contains a minimal `example-service` contract and the connected `api-template` contract. `apiGenerated.ts` is machine-owned and must not be edited manually. Application modules import through each service folder's `index.ts`, not from `apiGenerated.ts` directly.
+
+The auth provider bootstraps the HttpOnly refresh session, keeps access/CSRF tokens in memory, and performs a single-flight refresh plus one request retry on 401. Redux stores only auth status and the account snapshot.
 
 ## Localization
 
@@ -68,7 +70,8 @@ pnpm build
 ```text
 langs/                     # Tracked Tolgee namespaces by locale
 src/
-  api/example-service/     # Co-located Swagger, generated Axios client, and service export
+  api/example-service/     # Minimal standalone code-generation example
+  api/api-template/        # Connected auth/RBAC contract, client, and auth transport policy
   app/[locale]/            # Thai/English routes and boundaries
   components/              # Shared components and source-owned shadcn/ui
   config/icons.ts          # Project-wide Iconify icon IDs
@@ -81,4 +84,4 @@ tests/                     # Contract and architecture tests
 .github/workflows/         # CI quality gate
 ```
 
-See [OpenAPI code generation](docs/recipes/openapi-codegen.md), [TanStack Query](docs/recipes/tanstack-query.md), [Redux Toolkit](docs/recipes/redux-toolkit.md), [Iconify](docs/recipes/iconify.md), [Tolgee localization](docs/recipes/tolgee.md), and [template setup](docs/template-setup.md) for adoption details.
+See [authentication](docs/recipes/authentication.md), [OpenAPI code generation](docs/recipes/openapi-codegen.md), [TanStack Query](docs/recipes/tanstack-query.md), [Redux Toolkit](docs/recipes/redux-toolkit.md), [Iconify](docs/recipes/iconify.md), [Tolgee localization](docs/recipes/tolgee.md), and [template setup](docs/template-setup.md) for adoption details.

@@ -1,13 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
 
-const initialState = {}
-
-function rootReducer(state: Record<string, never> = initialState) {
-  return state
-}
+import { authReducer } from './auth-slice'
 
 export function makeStore() {
-  return configureStore({ reducer: rootReducer })
+  return configureStore({
+    reducer: {
+      auth: authReducer
+    }
+  })
 }
 
 export type AppStore = ReturnType<typeof makeStore>
